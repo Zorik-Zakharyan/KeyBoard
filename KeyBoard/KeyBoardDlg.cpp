@@ -12,6 +12,30 @@
 #define new DEBUG_NEW
 #endif
 
+struct KEY_BUTTON
+{
+	int key_id; // a -> 65
+	int button_id; // a -> IDC_BUTTON29
+	WCHAR capitalLetter; // a -> Ա
+	WCHAR smallLetter; // a -> ա
+};
+
+struct LANGUAGE
+{
+	LPCTSTR name;
+	KEY_BUTTON keyButtons[2];
+};
+
+LANGUAGE languages[] =
+{
+	_T("Armenian"),
+	{
+		{65, IDC_BUTTON29, 'Ա', 'ա'},
+		{66, IDC_BUTTON46, 'Բ', 'բ'},
+	},
+};
+
+LANGUAGE* language = &languages[0];
 
 // CAboutDlg dialog used for App About
 
@@ -66,6 +90,11 @@ BOOL CKeyBoardDlg::PreTranslateMessage(MSG* pMsg)
 {
 	if (pMsg->message == WM_KEYDOWN)
 	{
+		stdlog("WM_KEYDOWN: wParam = %d lParam = %d\n", pMsg->wParam, pMsg->lParam);
+		if (pMsg->wParam == 65)
+		{
+			TypeChar(_T('ա'));
+		}
 		return (1);
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
@@ -167,6 +196,14 @@ HCURSOR CKeyBoardDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+void CKeyBoardDlg::TypeChar(TCHAR ch)
+{
+	TCHAR szText[2];
+	szText[0] = ch;
+	szText[1] = 0;
+	m_Dboard.ReplaceSel(szText, TRUE);
+	m_Dboard.SetFocus();
+}
 
 
 void CKeyBoardDlg::OnBnClicked(UINT nID)
@@ -184,12 +221,10 @@ void CKeyBoardDlg::OnBnClicked(UINT nID)
 	switch (nID)
 	{
 	case IDC_BUTTON2:
-		m_Dboard.ReplaceSel(_T("է"), TRUE);
-		m_Dboard.SetFocus();
+		TypeChar(_T('է'));
 		break;
 	case IDC_BUTTON3:
-		m_Dboard.ReplaceSel(_T("թ"), TRUE);
-		m_Dboard.SetFocus();
+		TypeChar(_T('թ'));
 		break;
 	case IDC_BUTTON14:
 		m_Dboard.GetWindowTextW(tmp);
@@ -201,7 +236,5 @@ void CKeyBoardDlg::OnBnClicked(UINT nID)
 		m_Dboard.SetFocus();
 		
 	}
-	
-	
 }
 

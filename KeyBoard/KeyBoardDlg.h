@@ -36,7 +36,6 @@ public:
 	CEdit m_Dboard;
 	afx_msg void OnBnClicked(UINT nID);
 
-	
-
-	
+private:
+	void TypeChar(TCHAR ch);
 };
