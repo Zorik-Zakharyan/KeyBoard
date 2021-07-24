@@ -19,7 +19,7 @@ public:
 
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
-
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 
 // Implementation
 protected:
@@ -33,4 +33,10 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	CButton m_b1;
+	CEdit m_Dboard;
+	afx_msg void OnBnClicked(UINT nID);
+
+	
+
+	
 };

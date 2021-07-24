@@ -1,4 +1,4 @@
-
+﻿
 // KeyBoardDlg.cpp : implementation file
 //
 
@@ -60,12 +60,22 @@ void CKeyBoardDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_BUTTON1, m_b1);
+	DDX_Control(pDX, IDC_DASH_BOARD, m_Dboard);
 }
-
+BOOL CKeyBoardDlg::PreTranslateMessage(MSG* pMsg)
+{
+	if (pMsg->message == WM_KEYDOWN)
+	{
+		return (1);
+	}
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
 BEGIN_MESSAGE_MAP(CKeyBoardDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_CONTROL_RANGE(BN_CLICKED, IDC_BUTTON1, IDC_BUTTON58, &CKeyBoardDlg::OnBnClicked)
+	
 END_MESSAGE_MAP()
 
 
@@ -155,5 +165,43 @@ void CKeyBoardDlg::OnPaint()
 HCURSOR CKeyBoardDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
+}
+
+
+
+void CKeyBoardDlg::OnBnClicked(UINT nID)
+{
+	
+	//m_Dboard.SetWindowTextW(_T("է"));
+	//CString temp;
+	//m_Dboard.GetWindowTextW(temp);
+	//temp += _T("s");
+	//m_Dboard.SetWindowTextW(temp);
+	CString tmp;
+	int index,a,b;
+	//m_Dboard.ReplaceSel(_T("a"), TRUE);
+	//m_Dboard.SetFocus();
+	switch (nID)
+	{
+	case IDC_BUTTON2:
+		m_Dboard.ReplaceSel(_T("է"), TRUE);
+		m_Dboard.SetFocus();
+		break;
+	case IDC_BUTTON3:
+		m_Dboard.ReplaceSel(_T("թ"), TRUE);
+		m_Dboard.SetFocus();
+		break;
+	case IDC_BUTTON14:
+		m_Dboard.GetWindowTextW(tmp);
+		m_Dboard.GetSel(a, b);
+		index = b-1;
+		tmp.Delete(index,1);
+		m_Dboard.SetWindowTextW(tmp);
+		m_Dboard.SetSel(b-1,b-1);
+		m_Dboard.SetFocus();
+		
+	}
+	
+	
 }
 
