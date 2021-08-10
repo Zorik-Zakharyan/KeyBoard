@@ -7,35 +7,21 @@
 #include "KeyBoard.h"
 #include "KeyBoardDlg.h"
 #include "afxdialogex.h"
+#include "Languages.h"
+
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-struct KEY_BUTTON
-{
-	int key_id; // a -> 65
-	int button_id; // a -> IDC_BUTTON29
-	WCHAR capitalLetter; // a -> Ա
-	WCHAR smallLetter; // a -> ա
-};
+Layout gLayout;
 
-struct LANGUAGE
-{
-	LPCTSTR name;
-	KEY_BUTTON keyButtons[2];
-};
+//CKeyBoardDlg* app = (CKeyBoardDlg*)AfxGetApp();
+//CKeyBoardDlg* pDlg = (CKeyBoardDlg*)(app->getdlg);
+//HWND win = pDlg->GetSafeHwnd();
+// FindWindow("CKeyBoardDlg", Keyboard);*/
 
-LANGUAGE languages[] =
-{
-	_T("Armenian"),
-	{
-		{65, IDC_BUTTON29, 'Ա', 'ա'},
-		{66, IDC_BUTTON46, 'Բ', 'բ'},
-	},
-};
-
-LANGUAGE* language = &languages[0];
 
 // CAboutDlg dialog used for App About
 
@@ -78,6 +64,7 @@ CKeyBoardDlg::CKeyBoardDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_KEYBOARD_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
 }
 
 void CKeyBoardDlg::DoDataExchange(CDataExchange* pDX)
@@ -85,17 +72,132 @@ void CKeyBoardDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_BUTTON1, m_b1);
 	DDX_Control(pDX, IDC_DASH_BOARD, m_Dboard);
+	DDX_Control(pDX, IDC_LANGUAGECOMBO, m_Lcombo);
+	DDX_Control(pDX, IDC_BUTTON28, m_btnCapsLock);
+	DDX_Control(pDX, IDC_CAPS_INDICATE, m_RBcaps);
 }
 BOOL CKeyBoardDlg::PreTranslateMessage(MSG* pMsg)
 {
+	if (pMsg->message == WM_KEYUP)
+	{
+		BOOL ret = CDialogEx::PreTranslateMessage(pMsg);
+
+		UpDateKeyboard();
+
+		return ret;
+	}
 	if (pMsg->message == WM_KEYDOWN)
 	{
-		stdlog("WM_KEYDOWN: wParam = %d lParam = %d\n", pMsg->wParam, pMsg->lParam);
-		if (pMsg->wParam == 65)
+		BOOL ret = 1;
+
+		if (pMsg->wParam == VK_CAPITAL || pMsg->wParam == VK_SHIFT)
 		{
-			TypeChar(_T('ա'));
+			ret = CDialogEx::PreTranslateMessage(pMsg);
 		}
-		return (1);
+
+		stdlog("WM_KEYDOWN: wParam = %d lParam = %d\n", pMsg->wParam, pMsg->lParam);
+
+		bool isCaps = UpDateKeyboard();
+		//if (pMsg->wParam == VK_CAPITAL || pMsg->wParam == VK_SHIFT) //Caps Lock
+		//{		
+		//	m_btnCapsLock.SetState(capsON);
+		//	if ((GetKeyState(VK_CAPITAL) & 0x01) == 1)
+		//	{
+		//		SwitchToCaps(0, true);
+		//	}
+		//	else
+		//	{
+		//		SwitchToCaps(0, false);
+		//	}
+		//}
+		
+	
+		if (pMsg->wParam == 8) //BackSP
+		{
+			m_Dboard.GetWindowTextW(tmp);
+			m_Dboard.GetSel(a, b);
+			index = b - 1;
+			tmp.Delete(index, 1);
+			m_Dboard.SetWindowTextW(tmp);
+			m_Dboard.SetSel(b - 1, b - 1);
+			m_Dboard.SetFocus();
+		}
+
+		//Numbers 0-9 and operaations ( * / + -)
+		switch (pMsg->wParam)
+		{
+			case 96:
+				m_Dboard.ReplaceSel(_T("0"));
+				m_Dboard.SetFocus();
+				break;
+			case 97:
+				m_Dboard.ReplaceSel(_T("1"));
+				m_Dboard.SetFocus();
+				break;
+			case 98:
+				m_Dboard.ReplaceSel(_T("2"));
+				m_Dboard.SetFocus();
+				break;
+			case 99:
+				m_Dboard.ReplaceSel(_T("3"));
+				m_Dboard.SetFocus();
+				break;
+			case 100:
+				m_Dboard.ReplaceSel(_T("4"));
+				m_Dboard.SetFocus();
+				break;
+			case 101:
+				m_Dboard.ReplaceSel(_T("5"));
+				m_Dboard.SetFocus();
+				break;
+			case 102:
+				m_Dboard.ReplaceSel(_T("6"));
+				m_Dboard.SetFocus();
+				break;
+			case 103:
+				m_Dboard.ReplaceSel(_T("7"));
+				m_Dboard.SetFocus();
+				break;
+			case 104:
+				m_Dboard.ReplaceSel(_T("8"));
+				m_Dboard.SetFocus();
+				break;
+			case 105:
+				m_Dboard.ReplaceSel(_T("9"));
+				m_Dboard.SetFocus();
+				break;
+			case 106:
+				m_Dboard.ReplaceSel(_T("*"));
+				m_Dboard.SetFocus();
+				break;
+			case 107:
+				m_Dboard.ReplaceSel(_T("+"));
+				m_Dboard.SetFocus();
+				break;		
+			case 109:
+				m_Dboard.ReplaceSel(_T("-"));
+				m_Dboard.SetFocus();
+				break;
+			case 110:
+				m_Dboard.ReplaceSel(_T("."));
+				m_Dboard.SetFocus();
+				break;
+			case 111:
+				m_Dboard.ReplaceSel(_T("/"));
+				m_Dboard.SetFocus();
+				break;
+		}
+		//////////////////////////////////////////
+
+		//bool capsON = GetKeyState(VK_CAPITAL) & 0x01;
+		//stdlog("GetKeyState(): tmp = %x \n", capsON);
+					
+		
+		m_Dboard.ReplaceSel(gLayout.GetCharByVirtualKey(pMsg->wParam, isCaps));
+		m_Dboard.SetFocus();
+		
+		return ret;
+		
 	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
@@ -105,6 +207,8 @@ BEGIN_MESSAGE_MAP(CKeyBoardDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_CONTROL_RANGE(BN_CLICKED, IDC_BUTTON1, IDC_BUTTON58, &CKeyBoardDlg::OnBnClicked)
 	
+	ON_CBN_SELCHANGE(IDC_LANGUAGECOMBO, &CKeyBoardDlg::OnCbnSelchangeLanguagecombo)
+
 END_MESSAGE_MAP()
 
 
@@ -115,6 +219,14 @@ BOOL CKeyBoardDlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// Add "About..." menu item to system menu.
+	m_Lcombo.AddString(_T("Armenian"));
+	m_Lcombo.AddString(_T("English"));
+	m_Lcombo.SetCurSel(0);
+
+
+
+
+
 
 	// IDM_ABOUTBOX must be in the system command range.
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
@@ -141,6 +253,12 @@ BOOL CKeyBoardDlg::OnInitDialog()
 
 	// TODO: Add extra initialization here
 
+	/////////CAPS CHECK//////////////////////////
+
+
+	UpDateKeyboard();
+
+	/////////////////////////////////////////////
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -185,8 +303,10 @@ void CKeyBoardDlg::OnPaint()
 		CDialogEx::OnPaint();
 	}
 	CRect rc;
+	CClientDC dc(this);
 	m_b1.GetWindowRect(&rc);
 	ScreenToClient(rc);
+	
 }
 
 // The system calls this function to obtain the cursor to display while the user drags
@@ -205,28 +325,86 @@ void CKeyBoardDlg::TypeChar(TCHAR ch)
 	m_Dboard.SetFocus();
 }
 
+//void CKeyBoardDlg::SwitchToCapital(Layout language[],int x)
+//{
+//	for (int i = 1; i <= 58; i++)
+//	{
+//		if (i == language[x].keyButtons[i].button_id)
+//		{
+//			CString cap(language[x].keyButtons[i].capitalLetter);
+//		//	GetDlgItem(i)->SetWindowTextW(cap);
+//		}
+//	}
+//	
+//}
 
+void SendKey(WCHAR ch)
+{
+	INPUT inputs[2] = {};
+	ZeroMemory(inputs, sizeof(inputs));
+
+	inputs[0].type = INPUT_KEYBOARD;
+	inputs[0].ki.wVk = ch;
+
+	inputs[1].type = INPUT_KEYBOARD;
+	inputs[1].ki.wVk = ch;
+	inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
+
+	UINT uSent = SendInput(ARRAYSIZE(inputs), inputs, sizeof(INPUT));
+	
+}
 void CKeyBoardDlg::OnBnClicked(UINT nID)
 {
-	
-	//m_Dboard.SetWindowTextW(_T("է"));
-	//CString temp;
-	//m_Dboard.GetWindowTextW(temp);
-	//temp += _T("s");
-	//m_Dboard.SetWindowTextW(temp);
-	CString tmp;
-	int index,a,b;
-	//m_Dboard.ReplaceSel(_T("a"), TRUE);
-	//m_Dboard.SetFocus();
-	switch (nID)
+
+	//CString tmp;
+	//for (int i = 0; i < 40; i++)
+	//{
+	//	if (nID == language->keyButtons[i].button_id)
+	//	{
+	//		tmp += language->keyButtons[i].capitalLetter;
+	//		m_Dboard.ReplaceSel(tmp);
+	//		
+	//		tmp = _T("");
+	//		//break;
+	//	}
+	//}
+	////m_Dboard.SetWindowTextW(_T("է"));
+	////CString temp;
+	////m_Dboard.GetWindowTextW(temp);
+	////temp += _T("s");
+	////m_Dboard.SetWindowTextW(temp);
+	//CString tmp;
+	//int index,a,b;
+	////m_Dboard.ReplaceSel(_T("a"), TRUE);
+	////m_Dboard.SetFocus();
+	//switch (nID)
+	//{
+	//case IDC_BUTTON2:
+	//	TypeChar(_T('է'));
+	//	break;
+	//case IDC_BUTTON3:
+	//	TypeChar(_T('թ'));
+	//	break;
+	//case IDC_BUTTON14:
+	//	m_Dboard.GetWindowTextW(tmp);
+	//	m_Dboard.GetSel(a, b);
+	//	index = b-1;
+	//	tmp.Delete(index,1);
+	//	m_Dboard.SetWindowTextW(tmp);
+	//	m_Dboard.SetSel(b-1,b-1);
+	//	m_Dboard.SetFocus();
+	//	
+	//}
+
+	if (nID == IDC_BUTTON28)//Caps Lock
 	{
-	case IDC_BUTTON2:
-		TypeChar(_T('է'));
-		break;
-	case IDC_BUTTON3:
-		TypeChar(_T('թ'));
-		break;
-	case IDC_BUTTON14:
+		SendKey(VK_CAPITAL);
+	/*	capsON = GetKeyState(VK_CAPITAL) & 0x01;
+		m_btnCapsLock.SetState(capsON);*/
+		UpDateKeyboard();
+	}
+	if (nID == 1014) //BackSp
+	{
 		m_Dboard.GetWindowTextW(tmp);
 		m_Dboard.GetSel(a, b);
 		index = b-1;
@@ -234,7 +412,60 @@ void CKeyBoardDlg::OnBnClicked(UINT nID)
 		m_Dboard.SetWindowTextW(tmp);
 		m_Dboard.SetSel(b-1,b-1);
 		m_Dboard.SetFocus();
-		
 	}
+
+	bool capsON = GetCAPSstatus();
+	m_Dboard.ReplaceSel(gLayout.GetCharByButtonID(nID, capsON));
+	m_Dboard.SetFocus();
+	
 }
+void CKeyBoardDlg::OnCbnSelchangeLanguagecombo()
+{
+	
+	int CurrentSel;
+	CurrentSel=m_Lcombo.GetCurSel();
+	gLayout.SetCurSel(CurrentSel);
+	UpDateKeyboard();
+
+}
+bool CKeyBoardDlg::UpDateKeyboard()
+{
+	bool caps = GetCAPSstatus();
+
+	for (int i = 0; i < gLayout.GetButtonCount(); i++)
+	{
+	
+			CStringW ch(gLayout.GetLetter(gLayout.GetCurSel(), i, caps));
+			SetDlgItemText(gLayout.GetButtonID(i), ch);
+			
+	}
+	SetDlgItemText(IDC_BUTTON15, _T("Tab"));
+	SetDlgItemText(IDC_BUTTON56, _T("SPACE"));
+	
+	return caps;
+}
+
+bool CKeyBoardDlg::GetCAPSstatus()
+{
+	bool capsON = GetKeyState(VK_CAPITAL) & 0x01;
+	bool shiftON = GetKeyState(VK_LSHIFT) & 0x01;
+	//BYTE arr[256];
+	//GetKeyboardState(arr);
+	//bool capsON = arr[VK_CAPITAL] & 0x01;
+	//bool shiftON = arr[VK_SHIFT] & 0x01;
+	bool isCaps = (capsON && !shiftON) || (shiftON && !capsON);
+	stdlog("capsON = %d, shiftON = %d, isCups = %d  \n", capsON, shiftON, isCaps);
+
+	if (capsON == 1)
+	{
+		m_RBcaps.SetCheck(true);
+	}
+	else
+	{
+		m_RBcaps.SetCheck(false);
+	}
+	return isCaps;
+}
+
+
 

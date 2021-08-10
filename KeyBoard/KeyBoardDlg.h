@@ -38,4 +38,21 @@ public:
 
 private:
 	void TypeChar(TCHAR ch);
+
+public:
+	int capsCheck=0;
+	CString tmp;
+	int index, a, b;
+	//int virtCapsCheck=0;
+	CComboBox m_Lcombo;
+
+	/*LANGUAGE* language;*/
+	afx_msg void OnCbnSelchangeLanguagecombo();
+	CButton m_btnCapsLock;
+	bool UpDateKeyboard();
+	bool GetCAPSstatus();
+
+
+	
+	CButton m_RBcaps;
 };
