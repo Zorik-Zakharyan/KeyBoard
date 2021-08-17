@@ -90,7 +90,7 @@ BOOL CKeyBoardDlg::PreTranslateMessage(MSG* pMsg)
 	{
 		BOOL ret = 1;
 
-		if (pMsg->wParam == VK_CAPITAL || pMsg->wParam == VK_SHIFT)
+		if (pMsg->wParam == VK_CAPITAL || pMsg->wParam == VK_SHIFT || pMsg->wParam == 37 || pMsg->wParam == 38 || pMsg->wParam == 39 || pMsg->wParam == 40 || pMsg->wParam == 8 || pMsg->wParam == 13 || pMsg->wParam == 46 || ((pMsg->wParam >= 96) && (pMsg->wParam <= 111)))
 		{
 			ret = CDialogEx::PreTranslateMessage(pMsg);
 		}
@@ -112,19 +112,19 @@ BOOL CKeyBoardDlg::PreTranslateMessage(MSG* pMsg)
 		//}
 		
 	
-		if (pMsg->wParam == 8) //BackSP
-		{
-			m_Dboard.GetWindowTextW(tmp);
-			m_Dboard.GetSel(a, b);
-			index = b - 1;
-			tmp.Delete(index, 1);
-			m_Dboard.SetWindowTextW(tmp);
-			m_Dboard.SetSel(b - 1, b - 1);
-			m_Dboard.SetFocus();
-		}
+		//if (pMsg->wParam == 8) //BackSP
+		//{
+		//	m_Dboard.GetWindowTextW(tmp);
+		//	m_Dboard.GetSel(a, b);
+		//	index = b - 1;
+		//	tmp.Delete(index, 1);
+		//	m_Dboard.SetWindowTextW(tmp);
+		//	m_Dboard.SetSel(b - 1, b - 1);
+		//	m_Dboard.SetFocus();
+		//}
 
 		//Numbers 0-9 and operaations ( * / + -)
-		switch (pMsg->wParam)
+		/*switch (pMsg->wParam)
 		{
 			case 96:
 				m_Dboard.ReplaceSel(_T("0"));
@@ -186,7 +186,7 @@ BOOL CKeyBoardDlg::PreTranslateMessage(MSG* pMsg)
 				m_Dboard.ReplaceSel(_T("/"));
 				m_Dboard.SetFocus();
 				break;
-		}
+		}*/
 		//////////////////////////////////////////
 
 		//bool capsON = GetKeyState(VK_CAPITAL) & 0x01;
